@@ -1,0 +1,78 @@
+<form id="addUserform" #userForm="ngForm" (ngSubmit)="addUser(userForm)" novalidate>
+  <div class="form-group">
+    <div class="row p-3 ml-5">
+      <div class="col-md-6">
+        <div class="error-message-contianer">
+          <div class="field-error-message" *ngIf="addClicked">
+            <div class="alert alert-danger clear-float long-error-message text-right" [hidden]="!(firstName.hasError('required')
+                         || lastName.hasError('required') || employeeId.hasError('required'))">
+              <span class="alert-error-message">Please Enter FirstName, LastName and EmployeeID</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="firstName">First Name:</label>
+      <input class="col-md-3 form-control form-control-md" id="firstName" type="text" name="firstName" [(ngModel)]="user.firstName"
+        #firstName="ngModel" [required]="validaterequiredfields(userForm)">
+    </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="lastName">Last Name:</label>
+      <input class="col-md-3 form-control form-control-md" id="lastName" type="text" name="lastName" [(ngModel)]="user.lastName"
+        #lastName="ngModel" [required]="validaterequiredfields(userForm)">
+    </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="employeeId">Employee ID:</label>
+      <input class="col-md-3 form-control form-control-md" id="employeeId" type="text" name="employeeId" [(ngModel)]="user.employeeId"
+        #employeeId="ngModel" [required]="validaterequiredfields(userForm)">
+    </div>
+    <div class="row text-center">
+      <span class="col-md-3 text-right"></span>
+      <button *ngIf="!renderUpdateBtn" class="btn btn-success m-3" type="submit" id="addBtn">Add</button>
+      <button *ngIf="renderUpdateBtn" class="btn btn-success m-3" id="updateBtn" (click)="updateUser(user)">Update</button>
+      <button class="btn btn-success m-3" id="resetBtn" (click)="reset()">Reset</button>
+    </div>
+  </div>
+</form>
+<form>
+  <div class="form-group row">
+    <div class="col-md-3 p-3 ml-5">
+      <input class="form-control form-control-md" id="userIdsearch" type="text" name="userIdsearch" [(ngModel)]="userIdsearch"
+        placeholder="Search EmployeeId..">
+    </div>
+    <div class="col-md-8 p-3">
+      <label class="text-right" for="sort">Sort:</label>
+      <button class="ml-2 btn btn-success" id="fnsortBtn" (click)="sortFirstName()">FirstName</button>
+      <button class="ml-2 btn btn-success" id="lnsortBtn" (click)="sortLastName()">LastName</button>
+      <button class="ml-2 btn btn-success" id="empIdsortBtn" (click)="sortEmployeeId()">EmployeeId</button>
+    </div>
+  </div>
+  <div class="row">
+    <table class="table col-md-11 ml-5 table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Employee ID</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users  | userSearch : userIdsearch : fname : lname : empId">
+          <th scope="row">{{user.firstName}}</th>
+          <td>{{user.lastName}}</td>
+          <td>{{user.employeeId}}</td>
+          <td>
+            <div class="row text-center">
+              <button class="btn btn-outline-dark" [disabled]="user.status == 'InActive'" id="editBtn" (click)="editUser(user)">Edit
+              </button>
+              <button class="btn btn-outline-danger ml-lg-3" [disabled]="user.status == 'InActive'" id="deleteBtn"
+                (click)="deleteUser(user.userId)">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</form>

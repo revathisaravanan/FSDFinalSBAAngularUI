@@ -1,0 +1,153 @@
+<div *ngIf="rendertask" class=”container”>
+  <h2> Update Task </h2>
+  <form>
+    <div class="form-group">
+      <div class="row p-3">
+        <label class="col-md-3 text-right" for="project">Project</label>
+        <input class="col-md-3 form-control form-control-md" id="project" type="text" placeholder="Project Name"
+          name="Project" [(ngModel)]="editingTask.projectName" readonly>
+      </div>
+      <div class="row p-3">
+        <label class="col-md-3 text-right" for="taskName">Task</label>
+        <input class="col-md-3 form-control form-control-md" id="taskName" type="text" placeholder="Task's Name"
+          name="taskName" [(ngModel)]="editingTask.taskName">
+      </div>
+      <div class="row p-3">
+        <label class="col-md-3 text-right" for="priority">Priority</label>
+        <div class="col-md-2 pt-3">
+          <input class="form-control-range slider" type="range" id="priority" min="0" max="30" name="priority"
+            [(ngModel)]="editingTask.priority">
+        </div>
+        <div class="col-md-1 pt-3 text-center">
+          <span>{{editingTask.priority}}</span>
+        </div>
+      </div>
+      <div class="row p-3">
+        <label class="col-md-3 text-right" for="parentTaskName">Parent Task</label>
+        <input class="col-md-3 form-control form-control-md" id="parentTaskName" type="text" placeholder="Parent Task's Name"
+          name="parentTaskName" [(ngModel)]="editingTask.parentTaskName" readonly>
+        <button class="ml-2 mt-1 btn btn-success" id="parentSearchBtn" (click)="opentask(parentcontent)">Search</button>
+      </div>
+      <div class="row p-3">
+        <label class="col-md-3 p-3 text-right" for="startDate">Start Date</label>
+        <input class="col-md-3 p-3 form-control form-control-md" id="startDate" type="date" placeholder="Start Date"
+          name="startDate" [(ngModel)]="editingTask.startDate">
+      </div>
+      <div class="row p-3">
+        <label class="col-md-3 p-3 text-right" for="endDate">End Date</label>
+        <input class="col-md-3 p-3 form-control form-control-md" id="endDate" type="date" placeholder="End Date" name="endDate"
+          [(ngModel)]="editingTask.endDate">
+      </div>
+      <div class="row p-3">
+        <label class="col-md-3 text-right" for="user">User</label>
+        <input class="col-md-3 form-control form-control-md" id="user" type="text" placeholder="user" name="user"
+          [(ngModel)]="editingTask.managerName" readonly>
+      </div>
+      <div class="row text-center">
+        <span class="col-md-3 text-right"></span>
+        <button class="btn btn-success m-3" (click)="updateTask(editingTask)">Update</button>
+        <button class="btn btn-success m-3" (click)="cancelTask()">Cancel</button>
+
+      </div>
+    </div>
+  </form>
+</div>
+
+<form>
+  <div class="form-group p-4">
+    <div class="col-md-12 row p-2">
+      <input class="col-md-3 ml-5 form-control" id="projectsearch" type="text" name="projectsearch" [(ngModel)]="task.projectName"
+        readonly>
+      <button class="ml-2 btn btn-success" id="searchBtn" (click)="open(projectcontent)">Search</button>
+      <label class="ml-2 mt-2 text-right" for="sort">Sort By:</label>
+      <button class="ml-2 btn btn-success" id="startdtsortBtn" (click)="sortStartDate()">Start Date</button>
+      <button class="ml-2 btn btn-success" id="enddtsortBtn" (click)="sortEndDate()">End Date</button>
+      <button class="ml-2 btn btn-success" id="prioritysortBtn" (click)="sortPriority()">Priority</button>
+    </div>
+
+    <div class="row p-3">
+      <table class="table col-md-11 ml-5 table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Task</th>
+            <th scope="col">Parent</th>
+            <th scope="col">Priority Range (1-30)</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let task of tasks | taskSearch : startdatesort : enddatesort : prioritysort">
+            <th scope="row">{{task.taskId}}</th>
+            <td>{{task.taskName}}</td>
+            <td>{{task.parentTaskName}}</td>
+            <td>{{task.priority}}</td>
+            <td>{{task.startDate}}</td>
+            <td>{{task.endDate}}</td>
+            <td>
+              <div class="row text-center">
+                <button class="btn btn-outline-dark" [disabled]="task.status == 'InActive'" id="editBtn" (click)="editTask(task)">Edit
+                </button>
+                <button class="btn btn-outline-danger ml-lg-3" [disabled]="task.status == 'InActive'" id="endBtn"
+                  (click)="endTask(task)">End Task</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</form>
+
+<ng-template #projectcontent let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Project List</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <div *ngIf="selectedtasks">
+          <label for="selectProject">Select Project :</label>
+          <select [(ngModel)]="selected" name="selectedproject" (ngModelChange)="selecttask(selected)">
+            <option selected="" value="">--Select--</option>
+            <option *ngFor="let task of selectedtasks" [(ngValue)]="task.projectId">{{task.projectName}}</option>
+          </select>
+          <p>{{task.projectName}}</p>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close(selected)">Save</button>
+  </div>
+</ng-template>
+<ng-template #parentcontent let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Parent Task List</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <div *ngIf="parentTasks">
+          <label for="selectParentTask">Select Parent Task :</label>
+          <select [(ngModel)]="parentTask" name="selectedParentTask">
+            <option selected="" value="">--Select--</option>
+            <option *ngFor="let parenttask of parentTasks" [(ngValue)]="parenttask">{{parenttask.parentTaskName}}</option>
+          </select>
+          <p>{{ parentTask.parentTaskName }}</p>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close(selected)">Save</button>
+  </div>
+</ng-template>

@@ -1,0 +1,14 @@
+{
+  "name": "taskmanager",
+  "version": "0.0.0",
+  "main": "karma.conf.js",
+  "dependencies": {
+	"express": "^4.16.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

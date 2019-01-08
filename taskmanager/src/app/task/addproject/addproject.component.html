@@ -1,0 +1,137 @@
+<form id="addProjectform" #projectForm="ngForm" (ngSubmit)="addProject(projectForm)" novalidate>
+  <div class="form-group">
+      <div class="row p-3 ml-5">
+          <div class="col-md-4">
+            <div class="error-message-contianer">
+              <div class="field-error-message" *ngIf="addClicked">
+                <div class="alert alert-danger clear-float long-error-message text-right" 
+                    [hidden]="!projectName.hasError('required')">
+                  <span class="alert-error-message">Please Enter Project Title</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="project">Project:</label>
+      <input class="col-md-3 form-control form-control-md" id="projectName" type="text" name="projectName"
+        [(ngModel)]="project.projectName" #projectName="ngModel" [required]="validaterequiredfields(projectForm)">
+    </div>
+    <div class="row pt-3 pl-2 checkbox">
+      <div class="col-md-3 text-right" style="display: table-cell; vertical-align: middle;">
+        <input type="checkbox" [(ngModel)]="checkboxDisabled" (change)="checkBoxChange($event)" id="checkboxselect" name="checkboxselect">
+      </div>
+      <label class="col-md-3">
+        Set Start and End Date</label>
+    </div>
+    <div class="row pt-3 pl-2 p-3">
+      <label class="col-md-3 text-right" for="startDate">Start Date</label>
+      <input class="col-md-3  form-control form-control-md" id="startDate" type="date" name="startDate" id="startDate"
+        [(ngModel)]="project.startDate" [disabled]="!checkboxDisabled">
+    </div>
+    <div class="row pt-3 pl-2 p-3">
+      <label class="col-md-3 text-right" for="endDate">End Date</label>
+      <input class="col-md-3 form-control form-control-md" id="endDate" type="date" name="endDate" [(ngModel)]="project.endDate"
+        [disabled]="!checkboxDisabled">
+    </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="priority">Priority</label>
+      <div class="col-md-2 pt-3">
+        <input class="form-control-range slider" type="range" id="priority" min="0" max="30" name="priority"
+          [(ngModel)]="project.priority">
+      </div>
+      <div class="col-md-1 pt-3 text-center">
+        <span>{{project.priority}}</span>
+      </div>
+    </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="manager">Manager:</label>
+      <input class="col-md-3 form-control form-control-md" id="managerName" type="text" name="managerName"
+        [(ngModel)]="project.managerName" readonly>
+        <div class="text-right" style="display: table-cell; vertical-align: middle;">
+          <button class="ml-2 mt-1 btn btn-success" id="searchBtn" (click)="open(managercontent)">Search</button>
+        </div>
+    </div>
+    <div class="row text-center">
+      <span class="col-md-3 text-right"></span>
+      <button *ngIf="!renderUpdateBtn" class="m-3 btn btn-success" id="addBtn" type="submit">Add</button>
+      <button *ngIf="renderUpdateBtn" class="m-3 btn btn-success" id="updateBtn" (click)="updateProject(project)">Update</button>
+      <button class="m-3 btn btn-success" id="resetBtn" (click)="reset()">Reset</button>
+    </div>
+  </div>
+</form>
+<form>
+  <div class="form-group row">
+      <div class="col-md-3 p-3 ml-5">
+        <input class="form-control" id="projectsearch" type="text" name="projectsearch"
+          [(ngModel)]="projectsearch" placeholder="Search..">
+      </div>
+      <div class="col-md-8 p-3">
+        <label class="text-right" for="sort">Sort By:</label>
+        <button class="ml-2 btn btn-success" id="startdtsortBtn" (click)="sortStartDate()">Start Date</button>
+        <button class="ml-2 btn btn-success" id="enddtsortBtn" (click)="sortEndDate()">End Date</button>
+        <button class="ml-2 btn btn-success" id="prioritysortBtn" (click)="sortPriority()">Priority</button>
+        <button class="ml-2 btn btn-success" id="completedsortBtn" (click)="sortCompleted()">Completed</button>
+      </div>
+  </div>
+    <div class="row">
+      <table class="table col-md-11 ml-5 table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Project</th>
+            <th scope="col">No Of Tasks</th>
+            <th scope="col">Completed</th>
+            <th scope="col">Start Date</th>
+            <th scope="col">End Date</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let project of projects | projectFilter : projectsearch : startdatesort : enddatesort : prioritysort : statusort">
+            <th scope="row">{{project.projectName}}</th>
+            <td>{{project.noOfTask}}</td>
+            <td>{{project.noOfCompletedTask}}</td>
+            <td>{{project.startDate}}</td>
+            <td>{{project.endDate}}</td>
+            <td>{{project.priority}}</td>
+            <td>
+              <div class="row text-center">
+                <button class="btn btn-outline-dark" [disabled]="project.status == 'No'" id="updateBtn" (click)="editProject(project)">Update
+                </button>
+                <button class="btn btn-outline-danger ml-lg-3" [disabled]="project.status == 'No'" id="suspendBtn"
+                  (click)="suspendProject(project)">Suspend</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+</form>
+
+<ng-template #managercontent let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">User/Manager List</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <div *ngIf="users">
+          <label for="selectManager">Select Manager :</label>
+          <select [(ngModel)]="user" name="selectedmanager">
+            <option selected="" value="">--Select--</option>
+            <option *ngFor="let user of users" [(ngValue)]="user">{{user.firstName}} {{user.lastName}}</option>
+          </select>
+          <p>{{user.firstName}} {{user.lastName}}</p>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close(selected)">Save</button>
+  </div>
+</ng-template>

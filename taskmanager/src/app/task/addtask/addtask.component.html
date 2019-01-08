@@ -1,0 +1,150 @@
+<form id="addform" #taskForm="ngForm" (ngSubmit)="addTask(taskForm)" novalidate>
+  <div class="form-group">
+      <div class="row p-3 ml-5">
+          <div class="col-md-4">
+            <div class="error-message-contianer">
+              <div class="field-error-message" *ngIf="addClicked">
+                <div class="alert alert-danger clear-float long-error-message text-right" 
+                    [hidden]="!taskName.hasError('required')">
+                  <span class="alert-error-message">Please Enter Task</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="row p-3">
+      <label class="col-md-3 text-right" for="project">Project</label>
+      <input class="col-md-3 form-control form-control-md" id="project" type="text" 
+        placeholder="Project Name" name="Project" [(ngModel)]="task.projectName" readonly>
+       <button class="btn btn-success ml-2" id="projectSearchBtn" (click)="open(content)">Search</button>
+          </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="taskName">Task</label>
+      <input class="col-md-3 form-control form-control-md" id="taskName" type="text" placeholder="Task's Name" name="taskName"
+        [(ngModel)]="task.taskName" #taskName="ngModel" [required]="validaterequiredfields(taskForm)">
+    </div>
+    <div class="row pt-3 pl-2 checkbox">
+        <div class="col-md-3 text-right" style="display: table-cell; vertical-align: middle;">
+          <input type="checkbox" [(ngModel)]="checkboxDisabled" (change)="checkBoxChange($event)" 
+            name="checkboxselect">
+    </div>
+            <label class="col-md-3">Parent Task</label>
+      </div>
+    <div class="row p-3">
+      <label class="col-md-3 text-right" for="priority">Priority</label>
+      <div class="col-md-2 pt-3">
+        <input class="form-control-range slider" type="range" id="priority" min="0" max="30" name="priority"
+          [(ngModel)]="task.priority" [disabled]="checkboxDisabled">
+      </div>
+      <div class="col-md-1 pt-3 text-center">
+        <span>{{task.priority}}</span>
+      </div>
+    </div>
+    <div class="row p-3 pl-2 p-3 checkbox">
+      <label class="col-md-3 text-right" for="parentTaskName">Parent Task</label>
+      <input class="col-md-3 form-control form-control-md" id="parentTaskName" type="text" placeholder="Parent Task's Name"
+        name="parentTaskName" [(ngModel)]="task.parentTaskName"  readonly>
+        <button class="btn btn-success ml-2" id="parentSearchBtn" (click)="opentask(parentcontent)" [disabled]="checkboxDisabled">Search</button>
+    </div>
+    <div class="row pt-3 pl-2 p-3">
+      <label class="col-md-3 text-right" for="startDate">Start Date</label>
+      <input class="col-md-3 form-control form-control-md" id="startDate" type="date" placeholder="Start Date" name="startDate"
+        id="startDate" [(ngModel)]="task.startDate" [disabled]="checkboxDisabled">
+    </div>
+    <div class="row pt-3 pl-2 p-3">
+      <label class="col-md-3 text-right" for="endDate">End Date</label>
+      <input class="col-md-3 form-control form-control-md" id="endDate" type="date" placeholder="End Date" name="endDate"
+        [(ngModel)]="task.endDate" [disabled]="checkboxDisabled">
+    </div>
+    <div class="row p-3">
+        <label class="col-md-3 text-right" for="user">User</label>
+        <input class="col-md-3 form-control form-control-md" id="user" type="text" 
+          placeholder="user" name="user" [(ngModel)]="task.managerName" readonly>
+          <button class="btn btn-success ml-2" id="userSearchBtn" (click)="openuser(managercontent)">Search</button>
+      </div>
+    <div class="row p-3 text-center">
+      <span class="col-md-3 p-3 text-right"></span>
+      <button class="btn btn-success ml-2" id="addBtn" type="submit">Add Task</button>
+      <button class="btn btn-success ml-2" id="resetBtn" (click)="reset()">Reset</button>
+
+    </div>
+  </div>
+</form>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Project List</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <div *ngIf="projects">
+            <label for="selectProject">Select Project :</label>
+            <select [(ngModel)]="project" name="selectedproject">
+              <option selected="" value="">--Select--</option>
+              <option *ngFor="let project of projects" [(ngValue)]="project">{{project.projectName}}</option>
+            </select>
+            <p>Selected Project: {{ project.projectName }}</p>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="modal.close(selected)">Save</button>
+    </div>
+  </ng-template>
+
+  <ng-template #managercontent let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">User/Manager List</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <div *ngIf="users">
+              <label for="selectManager">Select Manager :</label>
+              <select [(ngModel)]="user" name="selectedmanager">
+                <option selected="" value="">--Select--</option>
+                <option *ngFor="let user of users" [(ngValue)]="user">{{user.firstName}} {{user.lastName}}</option>
+              </select>
+              <p>Selected User: {{ user.firstName }} {{ user.lastName }}</p>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="modal.close(selected)">Save</button>
+      </div>
+    </ng-template>
+
+    <ng-template #parentcontent let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Parent Task List</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <div *ngIf="parentTasks">
+              <label for="selectParentTask">Select Parent Task :</label>
+              <select [(ngModel)]="parentTask" name="selectedParentTask">
+                <option selected="" value="">--Select--</option>
+                <option *ngFor="let parenttask of parentTasks" [(ngValue)]="parenttask">{{parenttask.parentTaskName}}</option>
+              </select>
+              <p>{{ parentTask.parentTaskName }}</p>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="modal.close(selected)">Save</button>
+      </div>
+    </ng-template>
